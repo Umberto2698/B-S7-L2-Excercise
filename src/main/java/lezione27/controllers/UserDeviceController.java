@@ -9,6 +9,7 @@ import lezione27.services.UserDeviceService;
 import lezione27.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ public class UserDeviceController {
 
 
     @GetMapping("")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<User_Device> getUser_Device(@RequestParam(defaultValue = "0") int page,
                                             @RequestParam(defaultValue = "10") int size,
                                             @RequestParam(defaultValue = "id") String orderBy) {
@@ -34,11 +36,13 @@ public class UserDeviceController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public User_Device getInfo(@PathVariable UUID id) {
         return userDeviceService.getInfo(id);
     }
 
     @GetMapping("/history/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<User_Device> getUserHistory(@PathVariable UUID id, @RequestParam(defaultValue = "0") int page,
                                             @RequestParam(defaultValue = "10") int size,
                                             @RequestParam(defaultValue = "id") String orderBy) {
@@ -47,6 +51,7 @@ public class UserDeviceController {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public User_Device assignDeviceToUser(@RequestBody @Validated User_DeviceDTO body, BindingResult validation) {
         if (validation.hasErrors()) {
             throw new BadRequestException(validation.getAllErrors());
@@ -56,6 +61,7 @@ public class UserDeviceController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public User_Device updateWithdrawalDate(@RequestBody @Validated User_DeviceUpdateInfoDTO body, @PathVariable UUID id, BindingResult validation) {
         if (validation.hasErrors()) {
             throw new BadRequestException(validation.getAllErrors());

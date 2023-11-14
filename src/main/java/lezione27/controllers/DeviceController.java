@@ -8,6 +8,7 @@ import lezione27.services.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ public class DeviceController {
     private DeviceService deviceService;
 
     @GetMapping("")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<Device> getDevices(@RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "10") int size,
                                    @RequestParam(defaultValue = "id") String orderBy) {
@@ -28,12 +30,14 @@ public class DeviceController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Device getDevice(@PathVariable UUID id) {
         return deviceService.getById(id);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Device saveDevice(@RequestBody @Validated DeviceDTO body, BindingResult validation) {
         if (validation.hasErrors()) {
             throw new BadRequestException(validation.getAllErrors());
@@ -43,6 +47,7 @@ public class DeviceController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Device updateDeviceInfo(@PathVariable UUID id, @RequestBody @Validated DeviceUpdateInfoDTO body, BindingResult validation) {
         if (validation.hasErrors()) {
             throw new BadRequestException(validation.getAllErrors());
@@ -52,6 +57,7 @@ public class DeviceController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDevice(@PathVariable UUID id) {
         deviceService.delete(id);

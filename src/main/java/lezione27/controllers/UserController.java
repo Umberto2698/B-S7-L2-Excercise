@@ -7,6 +7,9 @@ import lezione27.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +38,7 @@ public class UserController {
 
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public User updateUserInfo(@PathVariable UUID id, @RequestBody @Validated UserUpdateInfoDTO body, BindingResult validation) {
         if (validation.hasErrors()) {
             throw new BadRequestException(validation.getAllErrors());
@@ -44,13 +48,36 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable UUID id) {
         userService.delete(id);
     }
 
     @PatchMapping("/{id}/upload")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public User updateUserPicture(@RequestParam("avatar") MultipartFile body, @PathVariable UUID id) throws IOException {
         return userService.uploadPicture(body, id);
+    }
+
+    @GetMapping("/me")
+    public UserDetails getProfile(@AuthenticationPrincipal UserDetails currentUser) {
+        return currentUser;
+    }
+
+    @PutMapping("/me")
+    public UserDetails updateProfile(@AuthenticationPrincipal User currentUser, @RequestBody UserUpdateInfoDTO body) {
+        return userService.update(currentUser.getId(), body);
+    }
+
+    @PatchMapping("/me/upload")
+    public User updateUserPicture(@RequestParam("avatar") MultipartFile body, @AuthenticationPrincipal User currentUser) throws IOException {
+        return userService.uploadPicture(body, currentUser.getId());
+    }
+
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProile(@AuthenticationPrincipal User currentUser) {
+        userService.delete(currentUser.getId());
     }
 }
