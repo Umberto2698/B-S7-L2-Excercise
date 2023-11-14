@@ -5,20 +5,23 @@ import lezione27.exceptions.BadRequestException;
 import lezione27.payloads.users.UserDTO;
 import lezione27.payloads.users.UserLoginDTO;
 import lezione27.payloads.users.UserSuccessLoginDTO;
+import lezione27.payloads.users.UserUpdateInfoDTO;
 import lezione27.services.AuthService;
-import lezione27.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    @Autowired
-    private UserService userService;
     @Autowired
     private AuthService authService;
 
@@ -34,7 +37,22 @@ public class AuthController {
         if (validation.hasErrors()) {
             throw new BadRequestException(validation.getAllErrors());
         } else {
-            return userService.save(body);
+            return authService.save(body);
         }
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public User updateUserInfo(@PathVariable UUID id, @RequestBody @Validated UserUpdateInfoDTO body, BindingResult validation) {
+        if (validation.hasErrors()) {
+            throw new BadRequestException(validation.getAllErrors());
+        } else {
+            return authService.update(id, body);
+        }
+    }
+
+    @PutMapping("/me")
+    public UserDetails updateProfile(@AuthenticationPrincipal User currentUser, @RequestBody UserUpdateInfoDTO body) {
+        return authService.update(currentUser.getId(), body);
     }
 }
