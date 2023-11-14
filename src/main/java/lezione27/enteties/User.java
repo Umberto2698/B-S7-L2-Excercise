@@ -1,12 +1,17 @@
 package lezione27.enteties;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.github.javafaker.Faker;
 import jakarta.persistence.*;
+import lezione27.enums.Role;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -18,7 +23,8 @@ import java.util.UUID;
 @Builder(builderClassName = "UserBuilder")
 @Entity
 @Table(name = "users")
-public class User {
+@JsonIgnoreProperties({"role", "password", "user_devices", "createdAt", "authorities", "enabled", "credentialsNonExpired", "accountNonExpired", "accountNonLocked"})
+public class User implements UserDetails {
     @Id
     private UUID id;
     private String name;
@@ -27,13 +33,14 @@ public class User {
     private String email;
     private String avatar;
     private String password;
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
 
     @CreationTimestamp
     @Column(name = "creation_date")
-    private LocalDateTime cratedAt;
+    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    @JsonIgnore
     private List<User_Device> user_devices;
 
     @Override
@@ -45,6 +52,31 @@ public class User {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(this.role.name()));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     public static class UserBuilder {

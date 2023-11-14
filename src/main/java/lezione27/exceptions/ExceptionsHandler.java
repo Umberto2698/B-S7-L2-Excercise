@@ -1,6 +1,5 @@
 package lezione27.exceptions;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lezione27.payloads.errors.ErrorsResponseDTO;
 import lezione27.payloads.errors.ErrorsResponseWithListDTO;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -39,10 +38,9 @@ public class ExceptionsHandler {
         return new ErrorsResponseDTO(e.getMessage(), new Date());
     }
 
-    @ExceptionHandler(InvalidFormatException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorsResponseDTO handle(InvalidFormatException e) {
-        e.printStackTrace();
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorsResponseDTO handleUnauthorizeRequest(UnauthorizedException e) {
         return new ErrorsResponseDTO(e.getMessage(), new Date());
     }
 

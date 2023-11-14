@@ -1,9 +1,9 @@
 package lezione27.enteties;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lezione27.enums.DeviceState;
 import lezione27.enums.DeviceType;
-import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -28,7 +28,7 @@ public class Device {
 
     @CreationTimestamp
     @Column(name = "creation_date")
-    private LocalDateTime cratedAt;
+    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "device", cascade = CascadeType.REMOVE)
     @JsonIgnore
@@ -42,8 +42,4 @@ public class Device {
                 ", type=" + type +
                 '}';
     }
-    //    @Enumerated(EnumType.STRING)
-    //    private DeviceState state = DeviceState.AVAILABLE;
-    //    @Enumerated(EnumType.STRING)
-    //    private DeviceType type;
 }
