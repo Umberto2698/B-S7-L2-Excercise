@@ -2,10 +2,7 @@ package lezione27.controllers;
 
 import lezione27.enteties.User;
 import lezione27.exceptions.BadRequestException;
-import lezione27.payloads.users.UserDTO;
-import lezione27.payloads.users.UserLoginDTO;
-import lezione27.payloads.users.UserSuccessLoginDTO;
-import lezione27.payloads.users.UserUpdateInfoDTO;
+import lezione27.payloads.users.*;
 import lezione27.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,6 +35,16 @@ public class AuthController {
             throw new BadRequestException(validation.getAllErrors());
         } else {
             return authService.save(body);
+        }
+    }
+
+    @PostMapping("/role/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public User updateRole(@PathVariable UUID id, @RequestBody @Validated RoleUpdateDTO body, BindingResult validation) {
+        if (validation.hasErrors()) {
+            throw new BadRequestException(validation.getAllErrors());
+        } else {
+            return authService.updateRole(id, body);
         }
     }
 

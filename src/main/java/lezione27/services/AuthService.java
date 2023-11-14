@@ -3,6 +3,7 @@ package lezione27.services;
 import lezione27.enteties.User;
 import lezione27.exceptions.BadRequestException;
 import lezione27.exceptions.UnauthorizedException;
+import lezione27.payloads.users.RoleUpdateDTO;
 import lezione27.payloads.users.UserDTO;
 import lezione27.payloads.users.UserLoginDTO;
 import lezione27.payloads.users.UserUpdateInfoDTO;
@@ -64,6 +65,12 @@ public class AuthService {
         if (!body.password().isEmpty()) {
             found.setPassword(bcrypt.encode(body.password()));
         }
+        return userRepository.save(found);
+    }
+
+    public User updateRole(UUID id, RoleUpdateDTO body) {
+        User found = userService.getById(id);
+        found.setRole(body.role());
         return userRepository.save(found);
     }
 }

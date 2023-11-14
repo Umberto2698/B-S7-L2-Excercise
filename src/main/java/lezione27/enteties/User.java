@@ -34,7 +34,7 @@ public class User implements UserDetails {
     private String avatar;
     private String password;
     @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
+    private Role role;
 
     @CreationTimestamp
     @Column(name = "creation_date")
@@ -85,5 +85,6 @@ public class User implements UserDetails {
         private String surname = faker.name().lastName();
         private String email = name + "." + surname + "@gmail.com";
         private String username = faker.funnyName().name();
+        private Role role = Role.USER;
     }
 }
