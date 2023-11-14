@@ -1,6 +1,7 @@
 package lezione27.controllers;
 
 import lezione27.enteties.User;
+import lezione27.payloads.users.UserResponseDTO;
 import lezione27.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,13 +36,13 @@ public class UserController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable UUID id) {
+    public void deleteUser(@PathVariable UUID id) throws IOException {
         userService.delete(id);
     }
 
     @PatchMapping("/{id}/upload")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public User updateUserPicture(@RequestParam("avatar") MultipartFile body, @PathVariable UUID id) throws IOException {
+    public UserResponseDTO updateUserPicture(@RequestParam("avatar") MultipartFile body, @PathVariable UUID id) throws Exception {
         return userService.uploadPicture(body, id);
     }
 
@@ -51,13 +52,13 @@ public class UserController {
     }
 
     @PatchMapping("/me/upload")
-    public User updateUserPicture(@RequestParam("avatar") MultipartFile body, @AuthenticationPrincipal User currentUser) throws IOException {
+    public UserResponseDTO updateUserPicture(@RequestParam("avatar") MultipartFile body, @AuthenticationPrincipal User currentUser) throws Exception {
         return userService.uploadPicture(body, currentUser.getId());
     }
 
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteProile(@AuthenticationPrincipal User currentUser) {
+    public void deleteProile(@AuthenticationPrincipal User currentUser) throws IOException {
         userService.delete(currentUser.getId());
     }
 }
